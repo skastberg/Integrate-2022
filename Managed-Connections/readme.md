@@ -18,7 +18,9 @@ Will generate connections.json files based on the connections in a provided reso
 
 >Assumes you have generated the connections with **Get-ConnectorBicep.ps1** and have stored the connectionkey in KeyVault. 
 
-Calls **Generate-ConnectionsRaw.ps1** and **Generate-Connections.ps1** and saves the files in a folder you provide.
+Calls **Generate-ConnectionsRaw.ps1** and **Generate-Connections.ps1** and saves the files in a folder you provide. The txt file contains connectionKeys from Keyvault, *.code.json contains the information to use in Visual Studio Code and *.az.json as the information should look like for Azure in the provided resource group.
+
+![Output example](OutputExample.jpg)
 
 **Generate-ConnectionsAdv.ps1**
 
