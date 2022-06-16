@@ -28,6 +28,7 @@ Calls **Generate-ConnectionsRaw.ps1** and **Generate-Connections.ps1** and saves
 | \<prefix>.connectionKeys.txt | Lines you can use in your local.settings.json to match the connection information created in \<prefix>.connections.code.json. Here we have to connectionKeys as when created the normal way in VS Code.  |
 | \<prefix>.KvReference.txt | Lines you can in your local.settings.json to match the connection information created in  \<prefix>.connections.code.json. Here we use Key vault references instead which is the best solution as you don't need to update the local.settings.json when the keys are updated.  |
 
+Output example
 
 ![Output example](OutputExample.jpg)
 
