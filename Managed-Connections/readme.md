@@ -14,11 +14,20 @@ Known issues:
 
 **Get-UpdatedManagedConnectionFiles.ps1**
 
-Will generate connections.json files based on the connections in a provided resource group.
+Will generate files containing Connection information based on the connections in a provided resource group to use in Visual Studio Code.
 
 >Assumes you have generated the connections with **Get-ConnectorBicep.ps1** and have stored the connectionkey in KeyVault. 
 
-Calls **Generate-ConnectionsRaw.ps1** and **Generate-Connections.ps1** and saves the files in a folder you provide. The txt file contains connectionKeys from Keyvault, *.code.json contains the information to use in Visual Studio Code and *.az.json as the information should look like for Azure in the provided resource group.
+Calls **Generate-ConnectionsRaw.ps1** and **Generate-Connections.ps1** and saves the files in a folder you provide. See the table below for details on the saved files.
+
+
+| File                            | Description                                                                                                                                          |
+| :------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
+| \<prefix>.connections.az.json   | Shows how the managed connections should look in should look in the deployment.                                                                      |
+| \<prefix>.connections.code.json | Shows how the managed connections should look in Visual Studio Code. Copy the contents of the managedApiConnections element to your connections.json |
+| \<prefix>.connectionKeys.txt | Lines you can use in your local.settings.json to match the connection information created in \<prefix>.connections.code.json. Here we have to connectionKeys as when created the normal way in VS Code.  |
+| \<prefix>.KvReference.txt | Lines you can in your local.settings.json to match the connection information created in  \<prefix>.connections.code.json. Here we use Key vault references instead which is the best solution as you don't need to update the local.settings.json when the keys are updated.  |
+
 
 ![Output example](OutputExample.jpg)
 

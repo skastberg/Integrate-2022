@@ -26,7 +26,7 @@ $ctx = Set-AzContext -Subscription $settings.values.WORKFLOWS_SUBSCRIPTION_ID
 
 Write-Host "Creating '$prefix.connections.az.json' as the managed connections should look in your release."  -ForegroundColor Cyan
 . "$PSScriptRoot\Generate-Connections.ps1" -resourceGroup $settings.values.WORKFLOWS_RESOURCE_GROUP_NAME -outputLocation "$destinationFolder\$prefix.connections.az.json"
-Write-Host "`r`nCreating '$prefix.connections.az.json' as the managed connections should look in Visual Studio Code. Copy the contents of the managedConnections element to your connections.json"  -ForegroundColor Cyan
+Write-Host "`r`nCreating '$prefix.connections.az.json' as the managed connections should look in Visual Studio Code. Copy the contents of the managedApiConnections element to your connections.json"  -ForegroundColor Cyan
 . "$PSScriptRoot\Generate-ConnectionsRaw.ps1" -resourceGroup $settings.values.WORKFLOWS_RESOURCE_GROUP_NAME -outputLocation "$destinationFolder\$prefix.connections.code.json"
 
 $connections = Get-Content -Path "$destinationFolder\$prefix.connections.code.json" -Encoding utf8 | ConvertFrom-Json -Depth 10
