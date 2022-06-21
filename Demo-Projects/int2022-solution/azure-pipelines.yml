@@ -1,0 +1,92 @@
+name: $(BuildDefinitionName)_1.0.$(date:yy)$(DayOfYear)$(rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Dev
+    displayName: Deploy Development
+    variables:
+    - group: int2022-dev      
+    jobs:
+      - job: Deploy
+        displayName: Deploy Job Dev
+        steps:
+
+        - task: AzurePowerShell@5
+          displayName: Generate connections file
+          inputs:
+            azureSubscription: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+            ScriptType: 'FilePath'
+            ScriptPath: '$(System.DefaultWorkingDirectory)/scripts/Generate-ConnectionsAdv.ps1'
+            ScriptArguments: '-resourceGroup rg-int2022-dev -connectionsDeployFile $(System.DefaultWorkingDirectory)/src/connections.deploy.json'
+            azurePowerShellVersion: 'LatestVersion'
+            pwsh: true
+            workingDirectory: '$(System.DefaultWorkingDirectory)/src'
+        - task: PowerShell@2
+          displayName: Replace Development Connections file
+          inputs:
+            targetType: 'inline'
+            script: |
+              #Get-ChildItem -Path . -Recurse
+              Copy-Item "$(System.DefaultWorkingDirectory)/src/connections.deploy.json" -Destination "$(System.DefaultWorkingDirectory)/src/connections.json" -Force
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).zip'
+            replaceExistingArchive: true
+        - task: AzureFunctionApp@1
+          displayName: 'Deploy logic app workflows'
+          inputs:
+            azureSubscription: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+            appType: 'workflowapp'
+            appName: 'int2022WorkflowsDev'
+            package: '$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).zip'
+            appSettings: '-serviceBus_connectionString $(sb_connectionstring) -environment $(environment)'
+            deploymentMethod: 'zipDeploy'
+
+  - stage: Test
+    displayName: Deploy Test
+    variables:
+    - group: int2022-test      
+    jobs:
+      - job: Deploy
+        displayName: Deploy Job Test
+        steps:
+        - task: AzurePowerShell@5
+          displayName: Generate connections file
+          inputs:
+            azureSubscription: 'MCT(00000000-0000-0000-0000-000000000111)'
+            ScriptType: 'FilePath'
+            ScriptPath: '$(System.DefaultWorkingDirectory)/scripts/Generate-ConnectionsAdv.ps1'
+            ScriptArguments: '-resourceGroup rg-int2022-test -connectionsDeployFile $(System.DefaultWorkingDirectory)/src/connections.deploy.json'
+            azurePowerShellVersion: 'LatestVersion'
+            pwsh: true
+            workingDirectory: '$(System.DefaultWorkingDirectory)/src'
+        - task: PowerShell@2
+          displayName: Replace Test Connections file
+          inputs:
+            targetType: 'inline'
+            script: |
+              #Get-ChildItem -Path . -Recurse
+              Copy-Item "$(System.DefaultWorkingDirectory)/src/connections.deploy.json" -Destination "$(System.DefaultWorkingDirectory)/src/connections.json" -Force
+        - task: ArchiveFiles@2
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/src'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).zip'
+            replaceExistingArchive: true
+        - task: AzureFunctionApp@1
+          displayName: 'Deploy logic app workflows'
+          inputs:
+            azureSubscription: 'MCT(1)(00000000-0000-0000-0000-000000000111)'
+            appType: 'workflowapp'
+            appName: 'int2022WorkflowsTest'
+            package: '$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).zip'
+            appSettings: '-serviceBus_connectionString $(sb_connectionstring) -environment $(environment)'
+            deploymentMethod: 'zipDeploy'

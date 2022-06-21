@@ -1,0 +1,1 @@
+Repository with IaC code for resources that are common to many solutions, like AppService Plan, Service Bus Namespace. 

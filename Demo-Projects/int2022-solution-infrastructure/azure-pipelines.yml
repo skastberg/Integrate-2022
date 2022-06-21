@@ -1,0 +1,56 @@
+name: $(BuildDefinitionName)_1.0.$(date:yy)$(DayOfYear)$(rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Dev
+    displayName: Deploy Development
+    variables:
+    - group: Deployment-dev      
+    jobs:
+      - job: Deploy
+        displayName: Deploy Job
+        steps:
+          - checkout: self
+          - task: AzureResourceManagerTemplateDeployment@3
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+              subscriptionId: '00000000-0000-0000-0000-000000000000'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'rg-int2022-dev'
+              location: 'West Europe'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Build.SourcesDirectory)/bicep/main.bicep'
+              csmParametersFile: '$(Build.SourcesDirectory)/bicep/environments/dev.parameters.json'
+              overrideParameters: '-BingMaps_ApiKey $(BingMaps_ApiKey) -twilio_sid $(twilio_sid) -twilio_token $(twilio_token)'
+              deploymentMode: 'Incremental'
+              deploymentName: '$(build.buildnumber)'
+              
+            
+  - stage: Test
+    displayName: Deploy Test
+    variables:
+    - group: Deployment-test      
+    jobs:
+      - job: Deploy
+        displayName: Deploy Job
+        steps:
+          - checkout: self
+          - task: AzureResourceManagerTemplateDeployment@3
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+              subscriptionId: '00000000-0000-0000-0000-000000000111'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'rg-int2022-test'
+              location: 'West Europe'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Build.SourcesDirectory)/bicep/main.bicep'
+              csmParametersFile: '$(Build.SourcesDirectory)/bicep/environments/test.parameters.json'
+              overrideParameters: '-BingMaps_ApiKey $(BingMaps_ApiKey) -twilio_sid $(twilio_sid) -twilio_token $(twilio_token)'
+              deploymentMode: 'Incremental'
+              deploymentName: '$(build.buildnumber)'

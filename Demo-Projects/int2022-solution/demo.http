@@ -1,0 +1,80 @@
+
+POST https://prod-19.westeurope.logic.azure.com:443/workflows/a879732ce5cd41d5938286b770b48718/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=AUggfI8VViedktxsY0WMwHWY6n1BbuI_TA8jIH9S3Uc HTTP/1.1
+Content-Type: application/json
+
+{
+    "messageId":"{{$guid}}",
+    "persons":[{"firstname":"Donald","lastname":"Duck" },
+            {"firstname":"Lennart","lastname":"Duck"}]}
+
+###
+
+# @name auth
+POST https://login.microsoft.com/{{$dotenv subscription}}/oauth2/token?api-version=1.0 HTTP/1.1
+Content-type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id={{clientId}}
+&client_secret={{$dotenv skiareaclientSecret}}
+&resource={{resource}}
+
+
+###
+
+POST https://someapiminstance/skiarea/v1/ResortEvents/ResortSnowing
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{$dotenv skiareaapiKey}}
+Authorization: Bearer {{auth.response.body.access_token}}
+
+{
+    "name": "Courmayeur",
+    "country": "Italy",
+    "expectedCm": {{$randomInt 55 123}}
+}
+
+###
+
+
+POST https://someapiminstance/skiarea/v1/ResortEvents/ResortSnowing
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{$dotenv skiareaapiKey}}
+Authorization: Bearer {{auth.response.body.access_token}}
+
+{
+    "name": "Val D'Isere",
+    "country": "France",
+    "expectedCm": {{$randomInt 55 150}}
+}
+
+###
+
+# @name openResort
+
+POST https://someapiminstance/skiarea/v1/ResortEvents/ResortOpen
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{$dotenv skiareaapiKey}}
+Authorization: Bearer {{auth.response.body.access_token}}
+
+{
+    "name": "Åre",
+    "country": "Sweden",
+    "openingTime": "{{$datetime iso8601}}"
+}
+
+
+###
+
+# @name closeResort
+
+POST https://someapiminstance/skiarea/v1/ResortEvents/ResortClose
+Content-Type: application/json
+Ocp-Apim-Subscription-Key: {{$dotenv skiareaapiKey}}
+Authorization: Bearer {{auth.response.body.access_token}}
+
+{
+    "name": "{{openResort.response.body.name}}",
+    "country": "{{openResort.response.body.country}}",
+    "closeTime": "{{$datetime iso8601}}"
+}
+
+###

@@ -1,0 +1,15 @@
+{
+    "rest-client.environmentVariables": {
+        "$shared": {},
+        "skiarea":{
+            "tenantId":"---tenantId---",
+            "clientId":"---clientId---",
+            "resource":"---resourceid---",
+        }     
+    },
+    "azureLogicAppsStandard.projectLanguage": "JavaScript",
+    "azureLogicAppsStandard.projectRuntime": "~3",
+    "azureLogicAppsStandard.deploySubpath": "src",
+    "debug.internalConsoleOptions": "neverOpen",
+    "azureFunctions.suppressProject": true
+}

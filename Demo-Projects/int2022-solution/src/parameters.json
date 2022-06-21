@@ -1,0 +1,22 @@
+{
+  "Environment": {
+    "type": "String",
+    "value": "@appsetting('environment')"
+  },
+  "ProcessedQueue": {
+    "type": "String",
+    "value": "int2022-processed-requests"
+  },
+  "IgnoredQueue": {
+    "type": "String",
+    "value": "int2022-ignored-requests"
+  },
+  "IncidentThreshold": {
+    "type": "Int",
+    "value": 65
+  },
+  "IncomingQueue": {
+    "type": "String",
+    "value": "int2022-snowevents"
+  }
+}

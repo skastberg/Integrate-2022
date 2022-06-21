@@ -1,0 +1,234 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Initialize_EventBody": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "EventBody",
+                            "type": "string",
+                            "value": "@{triggerOutputs()?['body']?['contentData']}"
+                        }
+                    ]
+                },
+                "runAfter": {}
+            },
+            "Parse_EventBody": {
+                "type": "ParseJson",
+                "inputs": {
+                    "content": "@variables('EventBody')",
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "source": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "type": "string"
+                            },
+                            "data": {
+                                "type": "object",
+                                "properties": {
+                                    "Name": {
+                                        "type": "string"
+                                    },
+                                    "Country": {
+                                        "type": "string"
+                                    },
+                                    "ExpectedCm": {
+                                        "type": "integer"
+                                    }
+                                }
+                            },
+                            "time": {
+                                "type": "string"
+                            },
+                            "specversion": {
+                                "type": "string"
+                            },
+                            "dataschema": {
+                                "type": "string"
+                            },
+                            "datacontenttype": {
+                                "type": "string"
+                            },
+                            "subject": {
+                                "type": "string"
+                            },
+                            "traceparent": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Initialize_EventBody": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "Condition": {
+                "type": "If",
+                "expression": {
+                    "and": [
+                        {
+                            "greaterOrEquals": [
+                                "@body('Parse_EventBody')?['data']?['ExpectedCm']",
+                                "@parameters('IncidentThreshold')"
+                            ]
+                        }
+                    ]
+                },
+                "actions": {
+                    "Send_processed": {
+                        "type": "ServiceProvider",
+                        "inputs": {
+                            "parameters": {
+                                "entityName": "@parameters('ProcessedQueue')",
+                                "message": {
+                                    "contentData": "@body('Parse_EventBody')?['data']",
+                                    "contentType": "application/json"
+                                }
+                            },
+                            "serviceProviderConfiguration": {
+                                "connectionName": "serviceBus",
+                                "operationId": "sendMessage",
+                                "serviceProviderId": "/serviceProviders/serviceBus"
+                            }
+                        },
+                        "runAfter": {}
+                    },
+                    "Get_forecast_for_today": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "referenceName": "msnweather"
+                                }
+                            },
+                            "method": "get",
+                            "path": "/forecast/today/@{encodeURIComponent(body('Parse_EventBody')?['data']?['Name'],',',body('Parse_EventBody')?['data']?['Country'])}",
+                            "queries": {
+                                "units": "Metric"
+                            }
+                        },
+                        "runAfter": {
+                            "Send_Text_Message_(SMS)": [
+                                "Succeeded",
+                                "FAILED",
+                                "SKIPPED",
+                                "TIMEDOUT"
+                            ]
+                        }
+                    },
+                    "Get_location_by_address": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "referenceName": "bingmaps"
+                                }
+                            },
+                            "method": "get",
+                            "path": "/REST/v1/Locations",
+                            "queries": {
+                                "locality": "@body('Parse_EventBody')?['data']?['Name']",
+                                "countryRegion": "@body('Parse_EventBody')?['data']?['Country']"
+                            }
+                        },
+                        "runAfter": {
+                            "Send_processed": [
+                                "Succeeded"
+                            ]
+                        }
+                    },
+                    "Send_Text_Message_(SMS)": {
+                        "type": "ApiConnection",
+                        "inputs": {
+                            "host": {
+                                "connection": {
+                                    "referenceName": "twilio"
+                                }
+                            },
+                            "method": "post",
+                            "body": {
+                                "from": "+4611111111",
+                                "to": "462222222",
+                                "body": "Heavy snow in @{body('Parse_EventBody')?['data']?['Name']}, @{body('Parse_EventBody')?['data']?['Country']}. Expected @{body('Parse_EventBody')?['data']?['ExpectedCm']} cm From @{parameters('Environment')}"
+                            },
+                            "path": "/Messages.json"
+                        },
+                        "runAfter": {
+                            "Get_location_by_address": [
+                                "Succeeded"
+                            ]
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Parse_EventBody": [
+                        "Succeeded"
+                    ]
+                },
+                "else": {
+                    "actions": {
+                        "Send_ignored": {
+                            "type": "ServiceProvider",
+                            "inputs": {
+                                "parameters": {
+                                    "entityName": "@parameters('IgnoredQueue')",
+                                    "message": {
+                                        "contentData": "@body('Parse_EventBody')?['data']",
+                                        "contentType": "application/json"
+                                    }
+                                },
+                                "serviceProviderConfiguration": {
+                                    "connectionName": "serviceBus",
+                                    "operationId": "sendMessage",
+                                    "serviceProviderId": "/serviceProviders/serviceBus"
+                                }
+                            },
+                            "runAfter": {}
+                        },
+                        "Terminate": {
+                            "type": "Terminate",
+                            "inputs": {
+                                "runStatus": "Succeeded"
+                            },
+                            "runAfter": {
+                                "Send_ignored": [
+                                    "Succeeded"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "triggers": {
+            "When_messages_are_available_in_a_queue": {
+                "type": "ServiceProvider",
+                "inputs": {
+                    "parameters": {
+                        "queueName": "@parameters('IncomingQueue')",
+                        "isSessionsEnabled": false
+                    },
+                    "serviceProviderConfiguration": {
+                        "connectionName": "serviceBus",
+                        "operationId": "receiveQueueMessages",
+                        "serviceProviderId": "/serviceProviders/serviceBus"
+                    }
+                },
+                "splitOn": "@triggerOutputs()?['body']"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {}
+    },
+    "kind": "Stateful"
+}

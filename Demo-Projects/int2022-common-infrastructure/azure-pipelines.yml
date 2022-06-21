@@ -1,0 +1,59 @@
+name: $(BuildDefinitionName)_1.0.$(date:yy)$(DayOfYear)$(rev:.r)
+
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage:
+  displayName: Deploy dev
+  variables:
+  - group: Deployment-dev  
+  jobs:
+  - deployment: deploy_dev_environment
+    environment:
+     name: 'int2022-dev'    
+  - job: PublishCommonInfra
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Deploy template    
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+        subscriptionId: '00000000-0000-0000-0000-000000000000'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'rg-int2022-dev'
+        location: 'West Europe'
+        templateLocation: 'Linked artifact'
+        csmFile: 'Bicep/main.bicep'
+        csmParametersFile: 'Bicep/main.parameters.dev.json'
+        deploymentMode: 'Incremental'
+        deploymentName: '$(build.buildnumber)'
+        overrideParameters: '-logAnalytics_WorkspaceId $(LogAnalytics_WorkspaceId)'
+
+- stage:
+  displayName: Deploy test
+  variables:
+  - group: Deployment-test  
+  jobs:
+  - deployment: deploy_test_environment
+    environment:
+     name: 'int2022-test'
+  - job: PublishCommonInfra
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: Deploy template
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+        subscriptionId: '00000000-0000-0000-0000-000000000111'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: 'rg-int2022-test'
+        location: 'West Europe'
+        templateLocation: 'Linked artifact'
+        csmFile: 'Bicep/main.bicep'
+        csmParametersFile: 'Bicep/main.parameters.test.json'
+        overrideParameters: '-logAnalytics_WorkspaceId $(LogAnalytics_WorkspaceId)'
+        deploymentMode: 'Incremental'
+        deploymentName: '$(build.buildnumber)'

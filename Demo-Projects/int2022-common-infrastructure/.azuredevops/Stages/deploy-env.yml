@@ -1,0 +1,37 @@
+parameters:
+- name: environment
+  type: string
+- name: azureResourceManagerConnection
+  type: string
+- name: subscriptionId
+  type: string
+- name: resourceGroupName
+  type: string
+
+stages:
+- stage:
+  displayName: Deploy ${{ parameters.environment }}
+  variables:
+  - group: 'Deployment-${{ parameters.environment }}'  
+  jobs:
+  - job: PublishCommonInfra
+    steps:
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: 'ls'
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: '${{ parameters.azureResourceManagerConnection }}'
+        subscriptionId: '${{ parameters.subscriptionId }}'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '${{ parameters.resourceGroupName }}'
+        location: 'West Europe'
+        templateLocation: 'Linked artifact'
+        csmFile: 'Bicep/main.bicep'
+        csmParametersFile: 'Bicep/main.parameters.dev.json'
+        deploymentMode: 'Incremental'
+        deploymentName: '$(build.buildnumber)'
+        overrideParameters: '-logAnalytics_WorkspaceId $(LogAnalytics_WorkspaceId)'

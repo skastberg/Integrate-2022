@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "rootName": {
+      "value": "Int2022Common"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "environmentType": {
+      "value": "nonprod"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "sb_namespace": {
+      "value": "sb-int2022-dev"
+    },
+    "sb_sku": {
+      "value": "Standard"
+    }
+  }
+}
