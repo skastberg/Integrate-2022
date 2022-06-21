@@ -18,8 +18,8 @@ stages:
           - task: AzureResourceManagerTemplateDeployment@3
             inputs:
               deploymentScope: 'Resource Group'
-              azureResourceManagerConnection: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
-              subscriptionId: '00000000-0000-0000-0000-000000000000'
+              azureResourceManagerConnection: 'Visual Studio Enterprise(---devSubscription--)'
+              subscriptionId: '---devSubscription--'
               action: 'Create Or Update Resource Group'
               resourceGroupName: 'rg-int2022-dev'
               location: 'West Europe'
@@ -43,8 +43,8 @@ stages:
           - task: AzureResourceManagerTemplateDeployment@3
             inputs:
               deploymentScope: 'Resource Group'
-              azureResourceManagerConnection: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
-              subscriptionId: '00000000-0000-0000-0000-000000000111'
+              azureResourceManagerConnection: 'Visual Studio Enterprise(---devSubscription--)'
+              subscriptionId: '---testSubscription--'
               action: 'Create Or Update Resource Group'
               resourceGroupName: 'rg-int2022-test'
               location: 'West Europe'

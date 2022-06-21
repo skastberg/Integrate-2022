@@ -18,7 +18,7 @@ stages:
         - task: AzurePowerShell@5
           displayName: Generate connections file
           inputs:
-            azureSubscription: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+            azureSubscription: 'Visual Studio Enterprise(---devSubscription--)'
             ScriptType: 'FilePath'
             ScriptPath: '$(System.DefaultWorkingDirectory)/scripts/Generate-ConnectionsAdv.ps1'
             ScriptArguments: '-resourceGroup rg-int2022-dev -connectionsDeployFile $(System.DefaultWorkingDirectory)/src/connections.deploy.json'
@@ -42,7 +42,7 @@ stages:
         - task: AzureFunctionApp@1
           displayName: 'Deploy logic app workflows'
           inputs:
-            azureSubscription: 'Visual Studio Enterprise(00000000-0000-0000-0000-000000000000)'
+            azureSubscription: 'Visual Studio Enterprise(---devSubscription--)'
             appType: 'workflowapp'
             appName: 'int2022WorkflowsDev'
             package: '$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).zip'
@@ -60,7 +60,7 @@ stages:
         - task: AzurePowerShell@5
           displayName: Generate connections file
           inputs:
-            azureSubscription: 'MCT(00000000-0000-0000-0000-000000000111)'
+            azureSubscription: 'MCT(---testSubscription--)'
             ScriptType: 'FilePath'
             ScriptPath: '$(System.DefaultWorkingDirectory)/scripts/Generate-ConnectionsAdv.ps1'
             ScriptArguments: '-resourceGroup rg-int2022-test -connectionsDeployFile $(System.DefaultWorkingDirectory)/src/connections.deploy.json'
@@ -84,7 +84,7 @@ stages:
         - task: AzureFunctionApp@1
           displayName: 'Deploy logic app workflows'
           inputs:
-            azureSubscription: 'MCT(1)(00000000-0000-0000-0000-000000000111)'
+            azureSubscription: 'MCT(1)(---testSubscription--)'
             appType: 'workflowapp'
             appName: 'int2022WorkflowsTest'
             package: '$(Build.ArtifactStagingDirectory)/$(Build.Buildnumber).zip'

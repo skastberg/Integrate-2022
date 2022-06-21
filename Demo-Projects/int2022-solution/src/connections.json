@@ -13,7 +13,7 @@
   "managedApiConnections": {
     "bingmaps": {
       "api": {
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Web/locations/westeurope/managedApis/bingmaps"
+        "id": "/subscriptions/---devSubscription--/providers/Microsoft.Web/locations/westeurope/managedApis/bingmaps"
       },
       "authentication": {
         "type": "Raw",
@@ -21,13 +21,13 @@
         "parameter": "@appsetting('bingmaps-connectionKey')"
       },
       "connection": {
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rg-int2022-dev/providers/microsoft.web/connections/bingmaps"
+        "id": "/subscriptions/---devSubscription--/resourcegroups/rg-int2022-dev/providers/microsoft.web/connections/bingmaps"
       },
       "connectionRuntimeUrl": "https://3b829fe9f0975a92.14.common.logic-westeurope.azure-apihub.net/apim/bingmaps/788bd6f6ab024898a829cb4e9b463d1d"
     },
     "msnweather": {
       "api": {
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Web/locations/westeurope/managedApis/msnweather"
+        "id": "/subscriptions/---devSubscription--/providers/Microsoft.Web/locations/westeurope/managedApis/msnweather"
       },
       "authentication": {
         "type": "Raw",
@@ -35,13 +35,13 @@
         "parameter": "@appsetting('msnweather-connectionKey')"
       },
       "connection": {
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rg-int2022-dev/providers/microsoft.web/connections/msnweather"
+        "id": "/subscriptions/---devSubscription--/resourcegroups/rg-int2022-dev/providers/microsoft.web/connections/msnweather"
       },
       "connectionRuntimeUrl": "https://3b829fe9f0975a92.14.common.logic-westeurope.azure-apihub.net/apim/msnweather/67bde9da6e8c4d2c88029840a387bff5"
     },
     "twilio": {
       "api": {
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Web/locations/westeurope/managedApis/twilio"
+        "id": "/subscriptions/---devSubscription--/providers/Microsoft.Web/locations/westeurope/managedApis/twilio"
       },
       "connectionRuntimeUrl": "https://3b829fe9f0975a92.14.common.logic-westeurope.azure-apihub.net/apim/twilio/bda98cb5976f4480b99f562193812c68",
       "authentication": {
@@ -50,7 +50,7 @@
         "parameter": "@appsetting('twilio-connectionKey')"
       },
       "connection": {
-        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-int2022-dev/providers/Microsoft.Web/connections/twilio"
+        "id": "/subscriptions/---devSubscription--/resourceGroups/rg-int2022-dev/providers/Microsoft.Web/connections/twilio"
       }
     }
   }

@@ -107,7 +107,7 @@ module queue 'modules/Queue.bicep' = [for item in queues: {
 // issues with different subscriptions, do manually for now
 module eventSubscription 'modules/eventSubscription.bicep' = {
   name: 'eventSubscription'
-  scope: resourceGroup('00000000-0000-0000-0000-000000000111' , 'Common-rg')
+  scope: resourceGroup('---testSubscription--' , 'Common-rg')
   params: {
     environment: environment
     EventGridTopic: 'sk-events-eg'
